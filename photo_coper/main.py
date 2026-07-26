@@ -133,7 +133,7 @@ def main():
 
     # LR
     if create_lr:
-        lr_dir = target_path / "LR"
+        lr_dir = target_path
         os.makedirs(lr_dir, exist_ok=True)
         if cfg['lr_template_path']:
             print("Копирование шаблона Lightroom...")
@@ -152,7 +152,7 @@ def main():
     if launch_lr:
         print("Запуск Lightroom...")
         # Ищем .lrcat в папке LR
-        lr_dir = target_path / "LR"
+        lr_dir = target_path
         lrcat_files = list(lr_dir.glob("*.lrcat"))
         if lrcat_files:
             os.startfile(str(lrcat_files[0])) if hasattr(os, 'startfile') else print(f"Запустите вручную: {lrcat_files[0]}")

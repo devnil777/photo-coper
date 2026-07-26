@@ -1,6 +1,7 @@
 import questionary
 import sys
 import os
+import shutil
 
 def format_duration(seconds):
     minutes, sec = divmod(int(seconds), 60)
@@ -61,29 +62,40 @@ def select_groups(files_by_date):
 
 def select_destination(dest_dirs):
     if not dest_dirs:
-        # Если в конфиге нет папок, просим ввести
         path = questionary.path("Введите путь к каталогу назначения:").ask()
         if not path:
             sys.exit(0)
         return path
 
-    choices = dest_dirs + ["Ввести другой путь..."]
+    choices = []
+    for dest in dest_dirs:
+        try:
+            usage = shutil.disk_usage(dest)
+            free_str = format_size(usage.free)
+            label = f"{dest} (свободно: {free_str})"
+        except (OSError, PermissionError, FileNotFoundError):
+            label = f"{dest} (недоступен)"
+        choices.append(questionary.Choice(label, value=dest))
+
+    choices.append(questionary.Separator())
+    choices.append(questionary.Choice("Ввести другой путь...", value="__custom__"))
+
     selected = questionary.select(
         "Выберите каталог куда копировать файлы:",
         choices=choices
     ).ask()
 
-    if selected == "Ввести другой путь...":
+    if selected == "__custom__":
         return questionary.path("Введите путь к каталогу назначения:").ask()
 
     return selected
 
 def ask_folder_name(dates):
     if len(dates) == 1:
-        name = questionary.text(f"Введите имя для папки (будет добавлено к {dates[0]}):").ask()
-        return f"{dates[0]} {name}".strip()
+        name = questionary.text(f"Введите имя для папки (будет склеено с {dates[0]} через дефис):").ask().strip()
+        return f"{dates[0]}-{name}"
     else:
-        name = questionary.text("Введите имя всей папки целиком:").ask()
+        name = questionary.text("Введите имя всей папки целиком:").ask().strip()
         return name
 
 def confirm_overwrite(path):
