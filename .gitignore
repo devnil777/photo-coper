@@ -1,0 +1,3 @@
+build/*
+photo_coper/__pycache__/*
+dist/*
