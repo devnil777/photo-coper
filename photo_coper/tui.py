@@ -2,6 +2,16 @@ import questionary
 import sys
 import os
 
+def format_duration(seconds):
+    minutes, sec = divmod(int(seconds), 60)
+    hours, minutes = divmod(minutes, 60)
+    if hours:
+        return f"{hours} ч {minutes} мин {sec} сек"
+    elif minutes:
+        return f"{minutes} мин {sec} сек"
+    else:
+        return f"{sec} сек"
+
 def format_size(size_bytes):
     if size_bytes == 0:
         return "0B"

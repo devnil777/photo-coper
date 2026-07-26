@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import winsound
 from pathlib import Path
 from photo_coper import config, scanner, tui, copier
 
@@ -95,6 +96,7 @@ def main():
     cp = copier.FileCopier(conflict_mode=conflict_mode, delete_after=delete_after)
 
     copied_count = 0
+    copied_size = 0
     skipped_count = 0
 
     from tqdm import tqdm
@@ -106,6 +108,7 @@ def main():
             res = cp.copy_file(f_info, src_target)
             if res == "copied":
                 copied_count += 1
+                copied_size += f_info['size']
             elif res == "skipped":
                 skipped_count += 1
 
@@ -139,9 +142,12 @@ def main():
     end_time = time.time()
     duration = end_time - start_time
 
-    print(f"\nГотово!")
-    print(f"Скопировано: {copied_count}, пропущено: {skipped_count}")
-    print(f"Время выполнения: {duration:.2f} сек.")
+    avg_speed = copied_size / duration if duration > 0 else 0
+    print(f"Готово! Скопировано: {copied_count} ({tui.format_size(copied_size)}) • Пропущено: {skipped_count} • Время: {tui.format_duration(duration)} • Скорость: {tui.format_size(int(avg_speed))}/с")
+
+    if cfg.get('sound_enabled', True):
+        winsound.Beep(880, 200)
+        winsound.Beep(1100, 300)
 
     if launch_lr:
         print("Запуск Lightroom...")

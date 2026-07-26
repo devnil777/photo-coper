@@ -9,6 +9,7 @@ DEFAULT_CONFIG = {
     "destination_directories": [],
     "lr_template_path": "",
     "lightroom_exe": "lightroom.exe",  # Default shell command
+    "sound_enabled": True,
 }
 
 def get_config_path():
